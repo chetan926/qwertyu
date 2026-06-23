@@ -1,3 +1,12 @@
+/**
+ * LinkCredentialsPage Component
+ * Renders the responsive Link Credentials page frontend including:
+ * - Dynamic step progress bar via StepIndicator
+ * - Volumetric structural graphics via BuildingIllustration
+ * - University autocomplete search (e.g. SRM University AP)
+ * - Department selection & academic ID validation forms
+ * - Fully accessible form states and micro-interactions
+ */
 import React, { useState, useEffect, useRef } from "react";
 import StepIndicator from "../components/StepIndicator";
 import BuildingIllustration from "../components/BuildingIllustration";
