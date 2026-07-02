@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { motion } from "motion/react";
 import {
   BookOpen,
   LayoutDashboard,
@@ -34,9 +35,12 @@ import {
   Cell,
   LineChart,
   Line,
-  CartesianGrid
+  CartesianGrid,
+  AreaChart,
+  Area
 } from "recharts";
 import imgAssessmentIntegrityLogo from "../../imports/LoginPortalIntegrityOs/assessment_integrity_logo.png";
+import { NotificationCenter } from "../components/NotificationCenter";
 
 interface FacultyPortalViewProps {
   user: any;
@@ -535,13 +539,17 @@ export default function FacultyPortalView({ user, session, handleLogout }: Facul
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 border-l border-[#ebdcc9] pl-4">
+            <NotificationCenter />
+            <div 
+              className="flex items-center gap-3 border-l border-[#ebdcc9] pl-4 cursor-pointer group"
+              onClick={() => window.dispatchEvent(new CustomEvent("open-profile-drawer"))}
+            >
               <div className="text-right hidden sm:block">
-                <div className="text-[13.5px] font-bold leading-tight text-[#1a1917]">{user.name}</div>
+                <div className="text-[13.5px] font-bold leading-tight text-[#1a1917] group-hover:text-zinc-600 transition-colors">{user.name}</div>
                 <div className="text-[11px] font-semibold text-[#8e8a80] leading-none mt-0.5">Faculty Administrator</div>
               </div>
-              <div className="w-9 h-9 rounded-full bg-[#1a1917] border border-[#c5af8a] text-white flex items-center justify-center font-bold text-sm">
-                {user.name.charAt(0).toUpperCase()}
+              <div className="w-9 h-9 rounded-full bg-[#1a1917] border border-[#c5af8a] text-white flex items-center justify-center font-bold text-sm group-hover:scale-105 transition-all">
+                {user.name ? user.name.charAt(0).toUpperCase() : "F"}
               </div>
             </div>
           </div>
@@ -576,30 +584,25 @@ export default function FacultyPortalView({ user, session, handleLogout }: Facul
 
               {/* Stats Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm">
-                  <span className="text-[11px] font-bold text-[#8e8a80] uppercase tracking-wider">Total Assessments</span>
-                  <div className="text-3xl font-extrabold mt-1">{assessments.length}</div>
-                  <span className="text-[11.5px] text-[#6b6760] mt-1.5 block">Exams & Quizzes</span>
-                </div>
-                <div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm">
-                  <span className="text-[11px] font-bold text-[#8e8a80] uppercase tracking-wider">Active Exams</span>
-                  <div className="text-3xl font-extrabold mt-1 text-emerald-600">
-                    {assessments.filter((a) => a.published).length}
-                  </div>
-                  <span className="text-[11.5px] text-[#6b6760] mt-1.5 block">Published and open</span>
-                </div>
-                <div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm">
-                  <span className="text-[11px] font-bold text-[#8e8a80] uppercase tracking-wider">Draft Exams</span>
-                  <div className="text-3xl font-extrabold mt-1 text-amber-500">
-                    {assessments.filter((a) => !a.published).length}
-                  </div>
-                  <span className="text-[11.5px] text-[#6b6760] mt-1.5 block">In creation phase</span>
-                </div>
-                <div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm">
-                  <span className="text-[11px] font-bold text-[#8e8a80] uppercase tracking-wider">University Matches</span>
-                  <div className="text-3xl font-extrabold mt-1 text-[#c5af8a]">SRM AP</div>
-                  <span className="text-[11.5px] text-[#6b6760] mt-1.5 block">Connected with matching students</span>
-                </div>
+                {[
+                  { title: "Total Assessments", value: assessments.length, footer: "Exams & Quizzes" },
+                  { title: "Active Exams", value: assessments.filter((a) => a.published).length, footer: "Published and open", valueColor: "text-emerald-600" },
+                  { title: "Draft Exams", value: assessments.filter((a) => !a.published).length, footer: "In creation phase", valueColor: "text-amber-500" },
+                  { title: "University Matches", value: "SRM AP", footer: "Connected with matching students", valueColor: "text-[#c5af8a]" }
+                ].map((stat, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: i * 0.05 }}
+                    whileHover={{ y: -4, scale: 1.025, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+                    className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm transition-all duration-300"
+                  >
+                    <span className="text-[11px] font-bold text-[#8e8a80] uppercase tracking-wider">{stat.title}</span>
+                    <div className={`text-3xl font-extrabold mt-1 ${stat.valueColor || "text-zinc-950"}`}>{stat.value}</div>
+                    <span className="text-[11.5px] text-[#6b6760] mt-1.5 block">{stat.footer}</span>
+                  </motion.div>
+                ))}
               </div>
 
               {/* Assessments List Table */}
@@ -1477,26 +1480,25 @@ export default function FacultyPortalView({ user, session, handleLogout }: Facul
                 <div className="space-y-6">
                   {/* Stats Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                    <div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm">
-                      <span className="text-[11px] font-bold text-[#8e8a80] uppercase tracking-wider">Total Attempts</span>
-                      <div className="text-3xl font-extrabold mt-1">{analyticsData.totalAttempts}</div>
-                      <span className="text-[11.5px] text-[#6b6760] mt-1.5 block">Completed submissions</span>
-                    </div>
-                    <div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm">
-                      <span className="text-[11px] font-bold text-[#8e8a80] uppercase tracking-wider">Average Score</span>
-                      <div className="text-3xl font-extrabold mt-1 text-[#c5af8a]">{analyticsData.averageScore}</div>
-                      <span className="text-[11.5px] text-[#6b6760] mt-1.5 block">Out of maximum points</span>
-                    </div>
-                    <div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm">
-                      <span className="text-[11px] font-bold text-[#8e8a80] uppercase tracking-wider">Average Integrity Index</span>
-                      <div className="text-3xl font-extrabold mt-1 text-emerald-600">{analyticsData.averageIntegrity}%</div>
-                      <span className="text-[11.5px] text-[#6b6760] mt-1.5 block">Consistent candidate behavior</span>
-                    </div>
-                    <div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm">
-                      <span className="text-[11px] font-bold text-[#8e8a80] uppercase tracking-wider">Total Violations</span>
-                      <div className="text-3xl font-extrabold mt-1 text-red-500">{analyticsData.totalViolations}</div>
-                      <span className="text-[11.5px] text-[#6b6760] mt-1.5 block">Flagged security alerts</span>
-                    </div>
+                    {[
+                      { title: "Total Attempts", value: analyticsData.totalAttempts, footer: "Completed submissions" },
+                      { title: "Average Score", value: analyticsData.averageScore, footer: "Out of maximum points", valueColor: "text-[#c5af8a]" },
+                      { title: "Average Integrity Index", value: `${analyticsData.averageIntegrity}%`, footer: "Consistent candidate behavior", valueColor: "text-emerald-600" },
+                      { title: "Total Violations", value: analyticsData.totalViolations, footer: "Flagged security alerts", valueColor: "text-red-500" }
+                    ].map((card, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: i * 0.05 }}
+                        whileHover={{ y: -4, scale: 1.025, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+                        className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm transition-all duration-300"
+                      >
+                        <span className="text-[11px] font-bold text-[#8e8a80] uppercase tracking-wider">{card.title}</span>
+                        <div className={`text-3xl font-extrabold mt-1 ${card.valueColor || "text-zinc-950"}`}>{card.value}</div>
+                        <span className="text-[11.5px] text-[#6b6760] mt-1.5 block">{card.footer}</span>
+                      </motion.div>
+                    ))}
                   </div>
 
                   {/* Graphs Row */}
@@ -1506,12 +1508,30 @@ export default function FacultyPortalView({ user, session, handleLogout }: Facul
                       <h3 className="text-sm font-bold mb-4">Score Distribution Profile</h3>
                       <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={analyticsData.scoreDistribution}>
+                          <AreaChart data={analyticsData.scoreDistribution}>
+                            <defs>
+                              <linearGradient id="scoreColor" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#c5af8a" stopOpacity={0.4}/>
+                                <stop offset="95%" stopColor="#c5af8a" stopOpacity={0.0}/>
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ebdcc9" opacity={0.3} />
                             <XAxis dataKey="range" fontSize={11} stroke="#8e8a80" />
                             <YAxis fontSize={11} stroke="#8e8a80" />
-                            <Tooltip cursor={{ fill: "#FAF6EE", opacity: 0.5 }} />
-                            <Bar dataKey="count" fill="#c5af8a" radius={[4, 4, 0, 0]} />
-                          </BarChart>
+                            <Tooltip 
+                              contentStyle={{
+                                backgroundColor: "#ffffff",
+                                borderColor: "#ebdcc9",
+                                borderRadius: "12px",
+                                boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.05)",
+                                fontSize: "11px",
+                                fontFamily: "Inter, sans-serif"
+                              }}
+                              itemStyle={{ color: "#1a1917" }}
+                              labelStyle={{ fontWeight: "bold", color: "#8e8a80" }}
+                            />
+                            <Area type="monotone" dataKey="count" stroke="#c5af8a" strokeWidth={2} fillOpacity={1} fill="url(#scoreColor)" />
+                          </AreaChart>
                         </ResponsiveContainer>
                       </div>
                     </div>

@@ -40,6 +40,10 @@ import {
   Cell,
 } from "recharts";
 import imgAssessmentIntegrityLogo from "../../imports/LoginPortalIntegrityOs/assessment_integrity_logo.png";
+import { ChatbotIcon } from "../components/ChatbotIcon";
+import { NotificationCenter } from "../components/NotificationCenter";
+import { PlagiarismAnalysis } from "../components/PlagiarismAnalysis";
+import { IntegrityReports } from "../components/IntegrityReports";
 
 interface DashboardViewProps {
   user: any;
@@ -261,6 +265,7 @@ export function DashboardView({
     { name: "Live Sessions", icon: Video },
     { name: "Integrity Reports", icon: ShieldAlert },
     { name: "AI Insights", icon: Sparkles },
+    { name: "Plagiarism Analysis", icon: Search },
     { name: "History", icon: History },
     { name: "Support", icon: HelpCircle },
     { name: "Documentation", icon: BookOpen },
@@ -319,7 +324,13 @@ export function DashboardView({
                   type="button"
                   onClick={() => {
                     setActiveTab(link.name);
-                    if (link.name !== "Overview" && link.name !== "Live Sessions" && link.name !== "Support") {
+                    if (
+                      link.name !== "Overview" &&
+                      link.name !== "Live Sessions" &&
+                      link.name !== "Support" &&
+                      link.name !== "Plagiarism Analysis" &&
+                      link.name !== "Integrity Reports"
+                    ) {
                       toast.info(`${link.name} is a demonstration section for this portal.`);
                     }
                   }}
@@ -380,36 +391,39 @@ export function DashboardView({
 
           <div className="flex items-center gap-4 ml-auto">
             {/* Action Buttons */}
-            <button
+            <NotificationCenter />
+            <motion.button
               type="button"
-              onClick={() => toast.info("No new alerts.")}
-              className="p-2 rounded-xl text-[#6b6760] hover:bg-[#FAF6EE] hover:text-[#1a1917] transition-colors relative cursor-pointer"
-            >
-              <Bell className="size-5" />
-              <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-emerald-500" />
-            </button>
-            <button
-              type="button"
-              onClick={() => toast.info("Settings console for this portal is disabled.")}
-              className="p-2 rounded-xl text-[#6b6760] hover:bg-[#FAF6EE] hover:text-[#1a1917] transition-colors cursor-pointer"
+              whileHover={{ scale: 1.05, rotate: 15 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => window.dispatchEvent(new CustomEvent("open-profile-drawer"))}
+              className="p-2 rounded-xl text-[#6b6760] hover:bg-[#FAF6EE] hover:text-[#1a1917] transition-colors cursor-pointer focus:outline-none"
             >
               <Settings className="size-5" />
-            </button>
+            </motion.button>
 
             {/* Profile Avatar Widget */}
-            <div className="flex items-center gap-3 border-l border-[#ebdcc9] pl-4">
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center gap-3 border-l border-[#ebdcc9] pl-4 cursor-pointer group select-none"
+              onClick={() => window.dispatchEvent(new CustomEvent("open-profile-drawer"))}
+            >
               <div className="text-right hidden sm:block">
-                <div className="text-[13.5px] font-bold leading-tight text-[#1a1917]">
+                <div className="text-[13.5px] font-bold leading-tight text-[#1a1917] group-hover:text-[#6b6760] transition-colors">
                   {user.name || "Student"}
                 </div>
                 <div className="text-[11px] font-semibold text-[#8e8a80] leading-none mt-0.5">
                   Level 2 Scholar
                 </div>
               </div>
-              <div className="w-9 h-9 rounded-full bg-[#1a1917] border border-[#c5af8a] text-white flex items-center justify-center font-bold text-sm select-none">
+              <motion.div 
+                whileHover={{ rotate: 5 }}
+                className="w-9 h-9 rounded-full bg-[#1a1917] border border-[#c5af8a] text-white flex items-center justify-center font-bold text-sm select-none shadow-sm"
+              >
                 {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </header>
 
@@ -489,7 +503,11 @@ export function DashboardView({
               {/* Top Row Grid of 4 KPI Metric Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 {/* Card 1: Integrity Score */}
-                <div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-[0_4px_20px_rgba(142,126,98,0.04)] flex flex-col justify-between">
+                <motion.div
+                  whileHover={{ y: -5, scale: 1.03, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)" }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-[0_4px_20px_rgba(142,126,98,0.04)] flex flex-col justify-between transition-all duration-300"
+                >
                   <div>
                     <div className="flex items-center justify-between">
                       <span className="text-[12px] font-bold text-[#8e8a80] uppercase tracking-wider">Integrity Score</span>
@@ -506,30 +524,38 @@ export function DashboardView({
                     </div>
                     <span className="text-[11.5px] text-[#6b6760] mt-2 block">Top 5% of your class cohort</span>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Card 2: Academic GPA */}
-                <div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-[0_4px_20px_rgba(142,126,98,0.04)] flex flex-col justify-between">
+                <motion.div
+                  whileHover={{ y: -5, scale: 1.03, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)" }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-[0_4px_20px_rgba(142,126,98,0.04)] flex flex-col justify-between transition-all duration-300"
+                >
                   <div>
                     <div className="flex items-center justify-between">
                       <span className="text-[12px] font-bold text-[#8e8a80] uppercase tracking-wider">Academic GPA</span>
                       <span className="text-[11px] font-bold text-[#c5af8a] bg-[#fffbf2] px-2 py-0.5 rounded-full border border-[#ebdcc9]">Scholar</span>
                     </div>
                     <div className="mt-2.5 flex items-baseline gap-1">
-                      <span className="text-3xl font-extrabold text-[#1a1917]">3.85</span>
-                      <span className="text-sm font-medium text-[#8e8a80]">/4.0</span>
+                      <span className="text-3xl font-extrabold text-[#1a1917]">10.0</span>
+                      <span className="text-sm font-medium text-[#8e8a80]">/10.0</span>
                     </div>
                   </div>
                   <div className="mt-4">
                     <div className="w-full bg-[#FAF6EE] h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-[#c5af8a] h-full rounded-full" style={{ width: "96.2%" }} />
+                      <div className="bg-[#c5af8a] h-full rounded-full" style={{ width: "100%" }} />
                     </div>
-                    <span className="text-[11.5px] text-[#6b6760] mt-2 block">Ranked in Top 10% of department</span>
+                    <span className="text-[11.5px] text-[#6b6760] mt-2 block">Perfect Academic Grade record</span>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Card 3: Attendance */}
-                <div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-[0_4px_20px_rgba(142,126,98,0.04)] flex flex-col justify-between">
+                <motion.div
+                  whileHover={{ y: -5, scale: 1.03, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)" }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-[0_4px_20px_rgba(142,126,98,0.04)] flex flex-col justify-between transition-all duration-300"
+                >
                   <div>
                     <div className="flex items-center justify-between">
                       <span className="text-[12px] font-bold text-[#8e8a80] uppercase tracking-wider">Attendance Rate</span>
@@ -545,10 +571,14 @@ export function DashboardView({
                     </div>
                     <span className="text-[11.5px] text-[#6b6760] mt-2 block">28/30 Live session sign-ins</span>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Card 4: Completion */}
-                <div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-[0_4px_20px_rgba(142,126,98,0.04)] flex flex-col justify-between">
+                <motion.div
+                  whileHover={{ y: -5, scale: 1.03, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)" }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-[0_4px_20px_rgba(142,126,98,0.04)] flex flex-col justify-between transition-all duration-300"
+                >
                   <div>
                     <div className="flex items-center justify-between">
                       <span className="text-[12px] font-bold text-[#8e8a80] uppercase tracking-wider">Course Modules</span>
@@ -564,7 +594,7 @@ export function DashboardView({
                     </div>
                     <span className="text-[11.5px] text-[#6b6760] mt-2 block">12/14 Core syllabus items complete</span>
                   </div>
-                </div>
+                </motion.div>
               </div>
 
               {/* Main workspace layout grid (split 2:1 column structure) */}
@@ -824,6 +854,35 @@ export function DashboardView({
                     </div>
                   </div>
 
+                  {/* Plagiarism Analysis Card */}
+                  <motion.div
+                    whileHover={{ y: -5, scale: 1.03, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)" }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-[0_4px_20px_rgba(142,126,98,0.04)] flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Search className="size-4.5 text-[#c5af8a]" />
+                          <span className="text-[12px] font-bold text-[#8e8a80] uppercase tracking-wider">Integrity Tools</span>
+                        </div>
+                        <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">Ready</span>
+                      </div>
+                      <h3 className="text-base font-bold text-[#1a1917] mt-3">Text Plagiarism Analysis</h3>
+                      <p className="text-xs text-[#8e8a80] mt-1.5 leading-relaxed">
+                        Scan assignments for semantic plagiarism, view matched source chunks, and generate detailed AI summaries.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("Plagiarism Analysis")}
+                      className="w-full mt-5 bg-[#1a1917] text-white hover:bg-black py-2.5 rounded-xl text-xs font-semibold shadow-[0_4px_10px_rgba(26,26,26,0.18)] hover:shadow-[0_6px_16px_rgba(26,26,26,0.24)] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>Launch Plagiarism Scanner</span>
+                      <ArrowRight className="size-3.5" />
+                    </button>
+                  </motion.div>
+
                   {/* Integrity Copilot Card */}
                   <div className="bg-[#FAF6EE] border border-[#ebdcc9] rounded-2xl p-5 shadow-[0_4px_16px_rgba(0,0,0,0.01)] flex flex-col justify-between">
                     <div>
@@ -946,7 +1005,7 @@ export function DashboardView({
                       <div className="p-4 border-b border-[#ebdcc9]/40 flex justify-between items-center bg-[#FAF6EE]/30">
                         <div>
                           <span className="text-[10px] font-mono font-bold text-[#8e8a80]">{activeSupportTicket.referenceNumber}</span>
-                          <h3 className="text-sm font-bold text-[#1a1917]">Support Assistant Chat</h3>
+                          <h3 className="text-sm font-bold text-[#1a1917]">Integrity Assistant Chat</h3>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border capitalize ${
@@ -954,7 +1013,7 @@ export function DashboardView({
                               ? "bg-zinc-50 border-zinc-200 text-zinc-500"
                               : activeSupportTicket.status === "active"
                               ? "bg-emerald-50 border-emerald-100 text-emerald-600 animate-pulse"
-                              : "bg-amber-50 border-amber-100 text-amber-600"
+                              : "bg-[#FAF0DD] border-[#e3d5ba] text-[#9a7b4f]"
                           }`}>
                             {activeSupportTicket.status}
                           </span>
@@ -963,7 +1022,7 @@ export function DashboardView({
 
                       {/* Queue Status / Live Triage */}
                       {activeSupportTicket.status !== "resolved" && (
-                        <div className="p-3 border-b border-[#ebdcc9]/30 bg-amber-50/50 flex flex-col gap-2">
+                        <div className="p-3 border-b border-[#ebdcc9]/30 bg-[#FAF0DD]/50 flex flex-col gap-2">
                           <div className="flex items-center justify-between text-xs font-semibold text-amber-800">
                             <span>Connecting to Support Queue...</span>
                             <span>Queue Position: #{activeSupportTicket.queuePosition || 1}</span>
@@ -974,15 +1033,15 @@ export function DashboardView({
                           </div>
                           {/* Pulsing connection bar */}
                           <div className="w-full bg-[#FAF6EE] h-1.5 rounded-full overflow-hidden mt-1 border border-[#ebdcc9]/20">
-                            <div className="bg-amber-500 h-full rounded-full animate-pulse" style={{ width: activeSupportTicket.assignedAgentId ? "100%" : "35%" }} />
+                            <div className="bg-[#9a7b4f] h-full rounded-full animate-pulse" style={{ width: activeSupportTicket.assignedAgentId ? "100%" : "35%" }} />
                           </div>
                         </div>
                       )}
 
                       {/* Messages Area */}
-                      <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#FAF6EE]/15">
-                        <div className="rounded-xl p-3 bg-[#FAF6EE]/50 border border-[#ebdcc9]/30 text-xs text-[#6b6760] leading-relaxed">
-                          <span className="font-bold text-[#1a1917] block mb-1">Your Submission Summary:</span>
+                      <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-zinc-950 text-white">
+                        <div className="rounded-xl p-3 bg-zinc-900 border border-zinc-800 text-xs text-zinc-300 leading-relaxed">
+                          <span className="font-bold text-white block mb-1">Your Submission Summary:</span>
                           {activeSupportTicket.description}
                         </div>
 
@@ -992,18 +1051,25 @@ export function DashboardView({
                           return (
                             <div
                               key={msg.id}
-                              className={`flex flex-col max-w-[80%] rounded-2xl p-3 text-xs leading-relaxed ${
-                                isMe
-                                  ? "ml-auto bg-[#1a1917] text-white"
-                                  : isAI
-                                  ? "bg-amber-50/80 border border-amber-200 text-amber-800"
-                                  : "bg-white border border-[#ebdcc9] text-[#1a1917]"
+                              className={`flex gap-2.5 max-w-[80%] items-start ${
+                                isMe ? "ml-auto" : "mr-auto"
                               }`}
                             >
-                              <span className="font-bold block mb-1">
-                                {isAI ? "AI Assistant" : msg.senderName}
-                              </span>
-                              <span>{msg.content}</span>
+                              {isAI && <ChatbotIcon className="size-6 mt-0.5" />}
+                              <div
+                                className={`flex flex-col rounded-2xl p-3 text-xs leading-relaxed ${
+                                  isMe
+                                    ? "bg-zinc-200 text-zinc-900 border border-zinc-300"
+                                    : isAI
+                                    ? "bg-white text-zinc-900 border border-zinc-200 shadow-[0_0_12px_rgba(255,255,255,0.15)]"
+                                    : "bg-white border border-zinc-200 text-zinc-900"
+                                }`}
+                              >
+                                <span className="font-bold block mb-1 text-[10px] text-zinc-400">
+                                  {isAI ? "Integrity Assistant" : msg.senderName}
+                                </span>
+                                <span className="font-medium text-zinc-900">{msg.content}</span>
+                              </div>
                             </div>
                           );
                         })}
@@ -1132,7 +1198,7 @@ export function DashboardView({
                                 ? "bg-zinc-50 border-zinc-200 text-zinc-500"
                                 : t.status === "active"
                                 ? "bg-emerald-50 border-emerald-100 text-emerald-600 animate-pulse"
-                                : "bg-amber-50 border-amber-100 text-amber-600"
+                                : "bg-[#FAF0DD] border-[#e3d5ba] text-[#9a7b4f]"
                             }`}>
                               {t.status}
                             </span>
@@ -1154,6 +1220,10 @@ export function DashboardView({
                 </div>
               </div>
             </div>
+          ) : activeTab === "Plagiarism Analysis" ? (
+            <PlagiarismAnalysis user={user} />
+          ) : activeTab === "Integrity Reports" ? (
+            <IntegrityReports user={user} dbAssessments={dbAssessments} />
           ) : (
             <div className="bg-white border border-[#ebdcc9] rounded-2xl p-10 text-center text-sm text-[#8e8a80] shadow-sm">
               <span className="text-lg font-bold block mb-2">{activeTab}</span>

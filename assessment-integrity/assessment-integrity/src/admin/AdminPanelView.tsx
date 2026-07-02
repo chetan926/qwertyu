@@ -38,6 +38,7 @@ import {
 	DialogDescription,
 	DialogFooter,
 } from "../app/components/ui/dialog";
+import { NotificationCenter } from "../app/components/NotificationCenter";
 
 interface AdminPanelViewProps {
 	user: any;
@@ -422,11 +423,13 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 			{/* Admin Sidebar Navigation Panel */}
 			<aside className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-[#ebdcc9]/60 flex flex-col justify-between shrink-0 p-5 select-none">
 				<div className="flex flex-col gap-6">
-					<div className="flex items-center gap-2.5 pb-2 border-b border-[#ebdcc9]/40">
-						<Shield className="size-6 text-zinc-950 fill-zinc-950/10" />
-						<div className="flex flex-col">
+					<div className="flex items-center gap-3 pb-4 border-b border-[#ebdcc9]/40">
+						<div className="flex items-center justify-center p-2 bg-zinc-950 text-white rounded-xl shadow-sm shrink-0">
+							<Shield className="size-5" />
+						</div>
+						<div className="flex flex-col gap-1">
 							<span className="font-bold text-sm leading-tight text-[#1a1917]">IntegrityOS Admin</span>
-							<span className="text-[10px] text-[#8e8a80] font-bold">System Control Center</span>
+							<span className="text-[10px] text-[#8e8a80] font-semibold leading-normal">System Control Center</span>
 						</div>
 					</div>
 
@@ -464,14 +467,20 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 				</div>
 
 				<div className="flex flex-col gap-3 pt-4 border-t border-[#ebdcc9]/40 mt-6 md:mt-0">
-					<div className="flex items-center gap-3">
-						<div className="size-8 rounded-full bg-[#1a1917] border border-[#c5af8a] flex items-center justify-center font-bold text-xs text-white">
-							SA
+					<div className="flex items-center justify-between gap-2">
+						<div 
+							className="flex items-center gap-3 cursor-pointer group min-w-0"
+							onClick={() => window.dispatchEvent(new CustomEvent("open-profile-drawer"))}
+						>
+							<div className="size-8 rounded-full bg-[#1a1917] border border-[#c5af8a] flex items-center justify-center font-bold text-xs text-white shrink-0 group-hover:scale-105 transition-all">
+								{user?.name ? user.name.slice(0, 2).toUpperCase() : "SA"}
+							</div>
+							<div className="flex flex-col min-w-0">
+								<span className="text-xs font-extrabold text-[#1a1917] leading-none truncate group-hover:text-zinc-600 transition-colors">{user?.name || "Balaji Admin"}</span>
+								<span className="text-[9px] text-[#8e8a80] font-semibold truncate leading-none mt-1">{user?.email}</span>
+							</div>
 						</div>
-						<div className="flex flex-col min-w-0">
-							<span className="text-xs font-extrabold text-[#1a1917] leading-none">Balaji Admin</span>
-							<span className="text-[9px] text-[#8e8a80] font-semibold truncate leading-none mt-1">{user?.email}</span>
-						</div>
+						<NotificationCenter />
 					</div>
 					<Button
 						onClick={handleBack}
@@ -494,7 +503,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -10 }}
-							className="space-y-6 w-full"
+							className="space-y-8 w-full"
 						>
 							<div className="flex items-center justify-between pb-4 border-b border-[#ebdcc9]/40">
 								<div>
@@ -531,82 +540,78 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 
 							{/* Volumetric Health Widgets */}
 							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-								<div className="bg-white border border-[#ebdcc9]/60 rounded-2xl p-4 shadow-sm flex items-center gap-3.5">
-									<div className="p-3 bg-zinc-50 rounded-xl border">
-										<Cpu className="size-6 text-zinc-800" />
-									</div>
-									<div>
-										<span className="text-[10px] font-bold text-[#8e8a80] uppercase tracking-wider block">CPU Utilisation</span>
-										<span className="text-xl font-extrabold">{healthMetrics?.infrastructure?.cpuUsage || 32}%</span>
-										<span className="text-[10px] text-zinc-400 block mt-0.5">8 Cores active</span>
-									</div>
-								</div>
-
-								<div className="bg-white border border-[#ebdcc9]/60 rounded-2xl p-4 shadow-sm flex items-center gap-3.5">
-									<div className="p-3 bg-zinc-50 rounded-xl border">
-										<Server className="size-6 text-zinc-800" />
-									</div>
-									<div>
-										<span className="text-[10px] font-bold text-[#8e8a80] uppercase tracking-wider block">Memory Usage</span>
-										<span className="text-xl font-extrabold">{healthMetrics?.infrastructure?.memoryUsage || 4.2} / 8.0 GB</span>
-										<span className="text-[10px] text-zinc-400 block mt-0.5">Scrypt pool allocated</span>
-									</div>
-								</div>
-
-								<div className="bg-white border border-[#ebdcc9]/60 rounded-2xl p-4 shadow-sm flex items-center gap-3.5">
-									<div className="p-3 bg-zinc-50 rounded-xl border">
-										<Database className="size-6 text-zinc-800" />
-									</div>
-									<div>
-										<span className="text-[10px] font-bold text-[#8e8a80] uppercase tracking-wider block">DB Connections</span>
-										<span className="text-xl font-extrabold">{healthMetrics?.infrastructure?.dbConnections || 14} Pools</span>
-										<span className="text-[10px] text-zinc-400 block mt-0.5">PrismaPg adapter latency: {healthMetrics?.infrastructure?.queryTime || 12}ms</span>
-									</div>
-								</div>
-
-								<div className="bg-white border border-[#ebdcc9]/60 rounded-2xl p-4 shadow-sm flex items-center gap-3.5">
-									<div className="p-3 bg-zinc-50 rounded-xl border">
-										<Activity className="size-6 text-zinc-800" />
-									</div>
-									<div>
-										<span className="text-[10px] font-bold text-[#8e8a80] uppercase tracking-wider block">Uptime Telemetry</span>
-										<span className="text-xl font-extrabold text-emerald-600">{healthMetrics?.infrastructure?.networkUptime || "99.99%"}</span>
-										<span className="text-[10px] text-zinc-400 block mt-0.5">Uptime: 23d 12h</span>
-									</div>
-								</div>
+								{[
+									{ title: "CPU Utilisation", value: `${healthMetrics?.infrastructure?.cpuUsage || 32}%`, detail: "8 Cores active", icon: Cpu },
+									{ title: "Memory Usage", value: `${healthMetrics?.infrastructure?.memoryUsage || 4.2} / 8.0 GB`, detail: "Scrypt pool allocated", icon: Server },
+									{ title: "DB Connections", value: `${healthMetrics?.infrastructure?.dbConnections || 14} Pools`, detail: `Pg adapter latency: ${healthMetrics?.infrastructure?.queryTime || 12}ms`, icon: Database },
+									{ title: "Uptime Telemetry", value: healthMetrics?.infrastructure?.networkUptime || "99.99%", detail: "Uptime: 23d 12h", icon: Activity, valueColor: "text-emerald-600" }
+								].map((metric, i) => {
+									const Icon = metric.icon;
+									return (
+										<motion.div
+											key={i}
+											initial={{ opacity: 0, y: 15 }}
+											animate={{ opacity: 1, y: 0 }}
+											transition={{ duration: 0.3, delay: i * 0.05 }}
+											whileHover={{ y: -4, scale: 1.025, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+											className="bg-white border border-[#ebdcc9]/60 rounded-2xl p-4 shadow-sm flex items-center gap-3.5 transition-all duration-300"
+										>
+											<div className="p-3 bg-zinc-50 rounded-xl border">
+												<Icon className="size-6 text-zinc-800" />
+											</div>
+											<div>
+												<span className="text-[10px] font-bold text-[#8e8a80] uppercase tracking-wider block">{metric.title}</span>
+												<span className={`text-xl font-extrabold block mt-0.5 ${metric.valueColor || "text-[#1a1917]"}`}>{metric.value}</span>
+												<span className="text-[10px] text-[#6b6760] block mt-0.5 leading-none">{metric.detail}</span>
+											</div>
+										</motion.div>
+									);
+								})}
 							</div>
 
 							{/* SOC Alert Panel (Security Operations Center) */}
 							<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-								<div className="lg:col-span-2 bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4">
-									<div className="flex items-center gap-2 border-b pb-2">
+								<motion.div
+									initial={{ opacity: 0, y: 15 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.4, delay: 0.2 }}
+									whileHover={{ y: -4, scale: 1.01, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+									className="lg:col-span-2 bg-white border border-[#ebdcc9]/60 rounded-2xl p-5 shadow-sm space-y-4 transition-all duration-300"
+								>
+									<div className="flex items-center gap-2 border-b border-[#ebdcc9]/40 pb-2">
 										<ShieldAlert className="size-5 text-zinc-800" />
 										<h3 className="text-sm font-extrabold text-zinc-800">Security Operations Center (SOC) Alerts</h3>
 									</div>
 									<div className="space-y-3.5">
 										{socAlerts.map((soc) => (
-											<div key={soc.id} className="flex items-start gap-3 p-3 border rounded-xl hover:bg-neutral-50 transition text-xs">
-												<AlertCircle className={`size-5 shrink-0 ${soc.severity === "high" ? "text-rose-500" : soc.severity === "medium" ? "text-amber-500" : "text-blue-500"}`} />
+											<div key={soc.id} className="flex items-start gap-3 p-3 border border-[#ebdcc9]/40 rounded-xl hover:bg-neutral-50 transition text-xs">
+												<AlertCircle className={`size-5 shrink-0 ${soc.severity === "high" ? "text-rose-500" : soc.severity === "medium" ? "text-[#b45309]" : "text-blue-500"}`} />
 												<div className="flex-1 space-y-1">
 													<div className="flex justify-between items-center">
 														<span className="font-extrabold text-zinc-800">{soc.type}</span>
 														<span className="text-[10px] font-mono text-zinc-400">{soc.timestamp.toLocaleTimeString()}</span>
 													</div>
-													<p className="text-zinc-600">{soc.msg}</p>
+													<p className="text-[#6b6760]">{soc.msg}</p>
 												</div>
 											</div>
 										))}
 									</div>
-								</div>
+								</motion.div>
 
 								{/* Maintenance Actions Quick Controls */}
-								<div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm flex flex-col justify-between gap-4">
+								<motion.div
+									initial={{ opacity: 0, y: 15 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.4, delay: 0.25 }}
+									whileHover={{ y: -4, scale: 1.01, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+									className="bg-white border border-[#ebdcc9]/60 rounded-2xl p-5 shadow-sm flex flex-col justify-between gap-4 transition-all duration-300"
+								>
 									<div>
-										<div className="flex items-center gap-2 border-b pb-2">
+										<div className="flex items-center gap-2 border-b border-[#ebdcc9]/40 pb-2">
 											<RotateCw className="size-5 text-zinc-800" />
 											<h3 className="text-sm font-extrabold text-zinc-800">Self-Healing Management</h3>
 										</div>
-										<p className="text-xs text-[#8e8a80] leading-relaxed mt-2.5">
+										<p className="text-xs text-[#6b6760] leading-relaxed mt-2.5">
 											Force a complete systems self-healing loop. The platform will automatically sweep connection pools, clear WS leaks, and test local agent response uptimes.
 										</p>
 									</div>
@@ -615,13 +620,13 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 										<button
 											type="button"
 											onClick={handleSelfHeal}
-											className="w-full py-2.5 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-850 cursor-pointer shadow-sm text-center"
+											className="w-full py-2.5 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-850 cursor-pointer shadow-sm text-center active:scale-[0.98] transition-all"
 										>
 											Trigger Diagnostics & Repair
 										</button>
-										<p className="text-[10px] text-center text-zinc-400">All self-healing acts are logged to immutable audits.</p>
+										<p className="text-[10px] text-center text-[#8e8a80]">All self-healing acts are logged to immutable audits.</p>
 									</div>
-								</div>
+								</motion.div>
 							</div>
 						</motion.div>
 					)}
@@ -633,7 +638,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -10 }}
-							className="space-y-6 w-full"
+							className="space-y-8 w-full"
 						>
 							<div className="flex items-center justify-between pb-4 border-b border-[#ebdcc9]/40">
 								<div>
@@ -700,11 +705,11 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 																	{u.name || "No Name Set"}
 																	{isCurrentUser && <span className="px-1.5 py-0.5 text-[8px] font-bold bg-[#ebdcc9] text-zinc-900 rounded">You</span>}
 																</span>
-																<span className="text-[10px] text-zinc-400 font-mono truncate">{u.email}</span>
+																<span className="text-[10px] text-[#6b6861] font-mono truncate">{u.email}</span>
 															</div>
 														</td>
 
-														<td className="p-4 font-semibold text-zinc-500">{getLoginType(u)}</td>
+														<td className="p-4 font-semibold text-zinc-700">{getLoginType(u)}</td>
 
 														<td className="p-4">
 															{isCurrentUser || u.email === "neelampallicharanbalaji14@gmail.com" ? (
@@ -713,7 +718,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 																<select
 																	value={u.role || "user"}
 																	onChange={(e) => handleRoleChange(u.id, e.target.value)}
-																	className="h-7 px-2 border rounded-lg text-[11px] font-semibold bg-white cursor-pointer"
+																	className="h-7 px-2 border border-[#ebdcc9] rounded-lg text-[11px] font-semibold text-zinc-800 bg-white cursor-pointer"
 																>
 																	<option value="user">Student / Candidate</option>
 																	<option value="faculty">Faculty evaluator</option>
@@ -820,14 +825,20 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -10 }}
-							className="space-y-6 w-full"
+							className="space-y-8 w-full"
 						>
 							<div className="pb-4 border-b border-[#ebdcc9]/40">
 								<h2 className="text-xl font-extrabold tracking-tight">Faculty Governance</h2>
 								<p className="text-xs text-[#6b6861]">Review faculty access approval, check created exams, evaluation performance, and review logs.</p>
 							</div>
 
-							<div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4">
+							<motion.div
+								initial={{ opacity: 0, y: 15 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{ duration: 0.3 }}
+								whileHover={{ y: -4, scale: 1.01, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+								className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4 transition-all duration-300"
+							>
 								<h3 className="text-sm font-extrabold">Faculty Directory & Performance Logs</h3>
 								<div className="overflow-x-auto">
 									<table className="w-full text-left border-collapse text-xs">
@@ -844,7 +855,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 										<tbody>
 											{users.filter(u => u.role === "faculty").map((fac) => (
 												<tr key={fac.id} className="border-b border-zinc-100 hover:bg-neutral-50/50">
-													<td className="py-3 font-bold text-zinc-950">{fac.name || "Faculty evaluator"} <span className="block text-[10px] font-mono font-normal text-zinc-400">{fac.email}</span></td>
+													<td className="py-3 font-bold text-zinc-950">{fac.name || "Faculty evaluator"} <span className="block text-[10px] font-mono font-normal text-[#6b6861]">{fac.email}</span></td>
 													<td className="py-3 text-zinc-600">{fac.institutionName || "SRM University AP"}</td>
 													<td className="py-3 text-center font-bold">4</td>
 													<td className="py-3 text-center font-bold">12</td>
@@ -862,7 +873,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 										</tbody>
 									</table>
 								</div>
-							</div>
+							</motion.div>
 						</motion.div>
 					)}
 
@@ -873,14 +884,20 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -10 }}
-							className="space-y-6 w-full"
+							className="space-y-8 w-full"
 						>
 							<div className="pb-4 border-b border-[#ebdcc9]/40">
 								<h2 className="text-xl font-extrabold tracking-tight">Assessment Compliance Management</h2>
 								<p className="text-xs text-[#6b6861]">Review institution-wide exam configurations, monitor candidate submissions, and check compliance thresholds.</p>
 							</div>
 
-							<div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4">
+							<motion.div
+								initial={{ opacity: 0, y: 15 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{ duration: 0.3 }}
+								whileHover={{ y: -4, scale: 1.01, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+								className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4 transition-all duration-300"
+							>
 								<h3 className="text-sm font-extrabold">Active Assessment Inventory</h3>
 								<div className="overflow-x-auto">
 									<table className="w-full text-left border-collapse text-xs">
@@ -897,7 +914,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 										<tbody>
 											{assessments.map((a) => (
 												<tr key={a.id} className="border-b border-zinc-100 hover:bg-neutral-50/50">
-													<td className="py-3 font-bold text-zinc-950">{a.title} <span className="block font-normal text-[10px] text-zinc-400">Duration: {a.duration} mins</span></td>
+													<td className="py-3 font-bold text-zinc-950">{a.title} <span className="block font-normal text-[10px] text-[#6b6861]">Duration: {a.duration} mins</span></td>
 													<td className="py-3 text-zinc-600 font-semibold">{a.facultyName}</td>
 													<td className="py-3 text-center font-bold">{a.attemptsCount} submitted</td>
 													<td className="py-3 text-center">
@@ -923,7 +940,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 										</tbody>
 									</table>
 								</div>
-							</div>
+							</motion.div>
 						</motion.div>
 					)}
 
@@ -934,7 +951,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -10 }}
-							className="space-y-6 w-full"
+							className="space-y-8 w-full"
 						>
 							<div className="pb-4 border-b border-[#ebdcc9]/40">
 								<h2 className="text-xl font-extrabold tracking-tight">Real-Time Examination Monitor</h2>
@@ -942,8 +959,15 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 							</div>
 
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-								{liveSessions.map((session) => (
-									<div key={session.id} className={`bg-white border rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between border-zinc-200`}>
+								{liveSessions.map((session, i) => (
+									<motion.div
+										key={session.id}
+										initial={{ opacity: 0, y: 15 }}
+										animate={{ opacity: 1, y: 0 }}
+										transition={{ duration: 0.3, delay: i * 0.05 }}
+										whileHover={{ y: -4, scale: 1.025, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+										className="bg-white border border-[#ebdcc9]/60 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between transition-all duration-300"
+									>
 										<div className="p-4 bg-zinc-50 border-b flex justify-between items-center text-xs">
 											<div>
 												<span className="font-extrabold block text-zinc-800">{session.studentName}</span>
@@ -965,7 +989,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 											<span className="font-bold text-zinc-600">Status: <span className="font-extrabold text-zinc-800">{session.status}</span></span>
 											<span className="text-[10px] font-bold text-rose-500">{session.alerts} alert(s)</span>
 										</div>
-									</div>
+									</motion.div>
 								))}
 							</div>
 						</motion.div>
@@ -978,7 +1002,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -10 }}
-							className="space-y-6 w-full"
+							className="space-y-8 w-full"
 						>
 							<div className="flex items-center justify-between pb-4 border-b border-[#ebdcc9]/40">
 								<div>
@@ -988,7 +1012,13 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 							</div>
 
 							<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-								<div className="lg:col-span-2 bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4">
+								<motion.div
+									initial={{ opacity: 0, y: 15 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.3 }}
+									whileHover={{ y: -4, scale: 1.01, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+									className="lg:col-span-2 bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4 transition-all duration-300"
+								>
 									<h3 className="text-sm font-extrabold">Active Systems AI Agent Pool</h3>
 									<div className="overflow-x-auto">
 										<table className="w-full text-left border-collapse text-xs">
@@ -1018,10 +1048,16 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 											</tbody>
 										</table>
 									</div>
-								</div>
+								</motion.div>
 
 								{/* AI Self Healing Event Logs */}
-								<div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4">
+								<motion.div
+									initial={{ opacity: 0, y: 15 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.3, delay: 0.1 }}
+									whileHover={{ y: -4, scale: 1.01, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+									className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4 transition-all duration-300"
+								>
 									<div className="flex items-center gap-2 border-b pb-2">
 										<Sliders className="size-4.5 text-zinc-800" />
 										<h3 className="text-sm font-extrabold text-zinc-800">Self-Healing Event Logs</h3>
@@ -1038,7 +1074,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 											</div>
 										))}
 									</div>
-								</div>
+								</motion.div>
 							</div>
 						</motion.div>
 					)}
@@ -1050,7 +1086,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -10 }}
-							className="space-y-6 w-full"
+							className="space-y-8 w-full"
 						>
 							<div className="pb-4 border-b border-[#ebdcc9]/40">
 								<h2 className="text-xl font-extrabold tracking-tight">Database & pgvector Management</h2>
@@ -1058,35 +1094,41 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 							</div>
 
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-								<div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm flex flex-col justify-between gap-3 text-xs">
-									<div>
-										<span className="font-bold text-[#8e8a80] block uppercase tracking-wider text-[10px]">Database Connection Pools</span>
-										<span className="text-xl font-extrabold mt-1 block">{healthMetrics?.infrastructure?.dbConnections || 14} active connections</span>
-									</div>
-									<div className="bg-zinc-50 p-2.5 rounded-lg border text-[10px]">
-										Prisma Client Adapters: <span className="font-bold text-zinc-700">@prisma/adapter-pg</span>
-									</div>
-								</div>
-
-								<div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm flex flex-col justify-between gap-3 text-xs">
-									<div>
-										<span className="font-bold text-[#8e8a80] block uppercase tracking-wider text-[10px]">pgvector Storage Utilization</span>
-										<span className="text-xl font-extrabold mt-1 block">54.2% (21.8 GB / 40.0 GB)</span>
-									</div>
-									<div className="bg-zinc-50 p-2.5 rounded-lg border text-[10px]">
-										Similarity Indexes: <span className="font-bold text-zinc-700">HNSW Cosine Vector Index</span>
-									</div>
-								</div>
-
-								<div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm flex flex-col justify-between gap-3 text-xs">
-									<div>
-										<span className="font-bold text-[#8e8a80] block uppercase tracking-wider text-[10px]">System Backup Logs</span>
-										<span className="text-sm font-extrabold mt-1 block text-emerald-600">Active (Daily automated script)</span>
-									</div>
-									<div className="bg-zinc-50 p-2.5 rounded-lg border text-[10px]">
-										Last backup: <span className="font-bold text-zinc-750">2026-06-20 03:00 AM</span>
-									</div>
-								</div>
+								{[
+									{
+										title: "Database Connection Pools",
+										value: `${healthMetrics?.infrastructure?.dbConnections || 14} active connections`,
+										footer: <>Prisma Client Adapters: <span className="font-bold text-zinc-700">@prisma/adapter-pg</span></>
+									},
+									{
+										title: "pgvector Storage Utilization",
+										value: "54.2% (21.8 GB / 40.0 GB)",
+										footer: <>Similarity Indexes: <span className="font-bold text-zinc-700">HNSW Cosine Vector Index</span></>
+									},
+									{
+										title: "System Backup Logs",
+										value: "Active (Daily automated script)",
+										valueColor: "text-emerald-600",
+										footer: <>Last backup: <span className="font-bold text-zinc-750">2026-06-20 03:00 AM</span></>
+									}
+								].map((card, i) => (
+									<motion.div
+										key={i}
+										initial={{ opacity: 0, y: 15 }}
+										animate={{ opacity: 1, y: 0 }}
+										transition={{ duration: 0.3, delay: i * 0.05 }}
+										whileHover={{ y: -4, scale: 1.025, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+										className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm flex flex-col justify-between gap-3 text-xs transition-all duration-300"
+									>
+										<div>
+											<span className="font-bold text-[#8e8a80] block uppercase tracking-wider text-[10px]">{card.title}</span>
+											<span className={`text-xl font-extrabold mt-1 block ${card.valueColor || "text-[#1a1917]"}`}>{card.value}</span>
+										</div>
+										<div className="bg-zinc-50 p-2.5 rounded-lg border text-[10px]">
+											{card.footer}
+										</div>
+									</motion.div>
+								))}
 							</div>
 						</motion.div>
 					)}
@@ -1098,7 +1140,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -10 }}
-							className="space-y-6 w-full"
+							className="space-y-8 w-full"
 						>
 							<div className="pb-4 border-b border-[#ebdcc9]/40">
 								<h2 className="text-xl font-extrabold tracking-tight">Support Operations Management</h2>
@@ -1106,15 +1148,27 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 							</div>
 
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-								<div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4">
+								<motion.div
+									initial={{ opacity: 0, y: 15 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.3 }}
+									whileHover={{ y: -4, scale: 1.015, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+									className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4 transition-all duration-300"
+								>
 									<h3 className="text-sm font-extrabold">Active Support Queue</h3>
 									<div className="text-center py-10 text-xs text-[#8e8a80]">
 										<MessageSquare className="size-8 mx-auto mb-2 text-zinc-300" />
 										All support tickets are successfully assigned to support agents.
 									</div>
-								</div>
+								</motion.div>
 
-								<div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4">
+								<motion.div
+									initial={{ opacity: 0, y: 15 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.3, delay: 0.1 }}
+									whileHover={{ y: -4, scale: 1.015, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+									className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4 transition-all duration-300"
+								>
 									<h3 className="text-sm font-extrabold">Support Metrics & Resolution Rates</h3>
 									<div className="space-y-3.5 text-xs">
 										<div className="flex justify-between border-b pb-2">
@@ -1130,7 +1184,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 											<span className="font-bold">4 active representatives</span>
 										</div>
 									</div>
-								</div>
+								</motion.div>
 							</div>
 						</motion.div>
 					)}
@@ -1142,7 +1196,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -10 }}
-							className="space-y-6 w-full"
+							className="space-y-8 w-full"
 						>
 							<div className="pb-4 border-b border-[#ebdcc9]/40">
 								<h2 className="text-xl font-extrabold tracking-tight">Audit & Compliance Center</h2>
@@ -1184,7 +1238,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -10 }}
-							className="space-y-6 w-full"
+							className="space-y-8 w-full"
 						>
 							<div className="pb-4 border-b border-[#ebdcc9]/40">
 								<h2 className="text-xl font-extrabold tracking-tight">System Settings & Platform Modes</h2>
@@ -1193,7 +1247,13 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 
 							<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 								{/* Left Form Settings */}
-								<div className="lg:col-span-2 bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4">
+								<motion.div
+									initial={{ opacity: 0, y: 15 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.3 }}
+									whileHover={{ y: -4, scale: 1.01, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+									className="lg:col-span-2 bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4 transition-all duration-300"
+								>
 									<h3 className="text-sm font-extrabold border-b pb-2">1. AI Agent Model Configuration</h3>
 									
 									<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1248,14 +1308,20 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 
 									<Button
 										onClick={() => handleSaveSettings()}
-										className="bg-[#1a1917] hover:bg-black text-white px-5 py-2 text-xs font-bold rounded-xl mt-3 cursor-pointer"
+										className="bg-[#1a1917] hover:bg-black text-white px-5 py-2 text-xs font-bold rounded-xl mt-3 cursor-pointer animate-none"
 									>
 										Save Platform Settings
 									</Button>
-								</div>
+								</motion.div>
 
 								{/* Maintenance and Emergency Shutdown Right Controls */}
-								<div className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4">
+								<motion.div
+									initial={{ opacity: 0, y: 15 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.3, delay: 0.1 }}
+									whileHover={{ y: -4, scale: 1.01, boxShadow: "0 10px 20px -5px rgba(142,126,98,0.12), 0 0 0 1px rgba(197, 175, 138, 0.3)", borderColor: "rgba(197, 175, 138, 0.5)" }}
+									className="bg-white border border-[#ebdcc9] rounded-2xl p-5 shadow-sm space-y-4 transition-all duration-300"
+								>
 									<h3 className="text-sm font-extrabold border-b pb-2 flex items-center gap-2">
 										<ShieldAlert className="size-4.5 text-zinc-800" /> Platform Security States
 									</h3>
@@ -1297,7 +1363,7 @@ export function AdminPanelView({ user, handleBack, parseUserAgent }: AdminPanelV
 											/>
 										</div>
 									</div>
-								</div>
+								</motion.div>
 							</div>
 						</motion.div>
 					)}

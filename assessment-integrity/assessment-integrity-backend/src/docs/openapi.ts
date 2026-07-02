@@ -41,6 +41,10 @@ export const openApiDocument: OpenApiDocument = {
 			name: "Health",
 			description: "Service and dependency health checks.",
 		},
+		{
+			name: "Plagiarism",
+			description: "Document plagiarism analysis services.",
+		},
 	],
 	paths: {
 		"/api/health": {
@@ -56,6 +60,84 @@ export const openApiDocument: OpenApiDocument = {
 							"application/json": {
 								schema: {
 									$ref: "#/components/schemas/HealthResponse",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		"/api/plagiarism/analyze-document": {
+			post: {
+				tags: ["Plagiarism"],
+				summary: "Analyze document plagiarism",
+				description: "Extracts text from an uploaded document (TXT, PDF, DOCX, PNG, JPG) and computes semantic similarity metrics against historical submissions.",
+				operationId: "analyzeDocument",
+				parameters: [
+					{
+						name: "x-user-id",
+						in: "header",
+						required: true,
+						schema: {
+							type: "string",
+						},
+						description: "The authenticated User ID.",
+					},
+					{
+						name: "x-user-role",
+						in: "header",
+						required: true,
+						schema: {
+							type: "string",
+						},
+						description: "The authenticated User Role.",
+					},
+				],
+				requestBody: {
+					required: true,
+					content: {
+						"multipart/form-data": {
+							schema: {
+								type: "object",
+								required: ["document"],
+								properties: {
+									document: {
+										type: "string",
+										format: "binary",
+										description: "The document file to upload (maximum 10MB).",
+									},
+								},
+							},
+						},
+					},
+				},
+				responses: {
+					"200": {
+						description: "Plagiarism analysis completed.",
+						content: {
+							"application/json": {
+								schema: {
+									$ref: "#/components/schemas/PlagiarismResponse",
+								},
+							},
+						},
+					},
+					"400": {
+						description: "Invalid request or file type.",
+						content: {
+							"application/json": {
+								schema: {
+									$ref: "#/components/schemas/ErrorResponse",
+								},
+							},
+						},
+					},
+					"401": {
+						description: "Unauthorized access.",
+						content: {
+							"application/json": {
+								schema: {
+									$ref: "#/components/schemas/ErrorResponse",
 								},
 							},
 						},
@@ -112,6 +194,94 @@ export const openApiDocument: OpenApiDocument = {
 					},
 					message: {
 						type: "string",
+					},
+				},
+			},
+			PlagiarismResponse: {
+				type: "object",
+				required: [
+					"success",
+					"filename",
+					"overallSimilarity",
+					"risk",
+					"confidence",
+					"processingTime",
+					"totalWords",
+					"matchedWords",
+					"uniqueWords",
+					"matchedChunks",
+					"aiExplanation",
+					"manualReview",
+					"generatedAt"
+				],
+				properties: {
+					success: {
+						type: "boolean",
+						examples: [true],
+					},
+					filename: {
+						type: "string",
+						examples: ["assignment.pdf"],
+					},
+					overallSimilarity: {
+						type: "integer",
+						examples: [34],
+					},
+					risk: {
+						type: "string",
+						enum: ["Low", "Moderate", "High", "Very High"],
+						examples: ["High"],
+					},
+					confidence: {
+						type: "number",
+						examples: [0.93],
+					},
+					processingTime: {
+						type: "string",
+						examples: ["3.5s"],
+					},
+					totalWords: {
+						type: "integer",
+						examples: [2480],
+					},
+					matchedWords: {
+						type: "integer",
+						examples: [812],
+					},
+					uniqueWords: {
+						type: "integer",
+						examples: [1668],
+					},
+					matchedChunks: {
+						type: "array",
+						items: {
+							type: "object",
+							required: ["chunk", "similarity", "reason"],
+							properties: {
+								chunk: {
+									type: "integer",
+								},
+								similarity: {
+									type: "integer",
+								},
+								reason: {
+									type: "string",
+								},
+								matchedText: {
+									type: "string",
+								},
+							},
+						},
+					},
+					aiExplanation: {
+						type: "string",
+					},
+					manualReview: {
+						type: "boolean",
+					},
+					generatedAt: {
+						type: "string",
+						format: "date-time",
 					},
 				},
 			},

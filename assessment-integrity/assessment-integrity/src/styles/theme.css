@@ -3,7 +3,8 @@
 :root {
   --font-size: 16px;
   --background: #f5f0e6;
-  --foreground: #1a1917;
+  --foreground: #0C090A;
+  /*--foreground: #1a1917;*/
   --card: rgba(255, 255, 255, 0.85);
   --card-foreground: #1a1917;
   --popover: oklch(1 0 0);
@@ -79,8 +80,8 @@
 }
 
 @theme inline {
-  --font-sans: "Calibri", sans-serif;
-  --font-mono: "Calibri", monospace;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-page-bg: #fff1d3;
@@ -96,13 +97,13 @@
   --color-tan-500: #d3c2a6;
   --color-ready-green: #24a37a;
 
-  --shadow-card: 0px 24px 48px -8px rgba(142,126,98,0.22);
-  --shadow-card-hover: 0px 32px 64px -12px rgba(142,126,98,0.28);
-  --shadow-icon-wrap: 0px 2px 8px rgba(0,0,0,0.04);
-  --shadow-pill: 0px 2px 6px rgba(0,0,0,0.06);
-  --shadow-upload-box: inset 0px 2px 4px rgba(0,0,0,0.02);
-  --shadow-btn-dark: 0px 4px 12px rgba(26,26,26,0.18);
-  --shadow-btn-dark-hover: 0px 6px 18px rgba(26,26,26,0.24);
+  --shadow-card: 0px 24px 48px -8px rgba(142, 126, 98, 0.22);
+  --shadow-card-hover: 0px 32px 64px -12px rgba(142, 126, 98, 0.28);
+  --shadow-icon-wrap: 0px 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-pill: 0px 2px 6px rgba(0, 0, 0, 0.06);
+  --shadow-upload-box: inset 0px 2px 4px rgba(0, 0, 0, 0.02);
+  --shadow-btn-dark: 0px 4px 12px rgba(26, 26, 26, 0.18);
+  --shadow-btn-dark-hover: 0px 6px 18px rgba(26, 26, 26, 0.24);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -144,12 +145,12 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    font-family: "Calibri", sans-serif;
+    font-family: "Inter", sans-serif;
   }
 
   body {
     @apply bg-background text-foreground;
-    font-family: "Calibri", sans-serif;
+    font-family: "Inter", sans-serif;
   }
 
   /**

@@ -142,7 +142,6 @@ export default function StudentExamView({ assessmentId, user, onClose }: Student
         setDetectionProgress((prev) => {
           if (prev >= 100) {
             clearInterval(progressInterval);
-            setFaceAligned(true);
             
             // Execute automated photo capture
             if (captureVideoRef.current) {
@@ -153,8 +152,33 @@ export default function StudentExamView({ assessmentId, user, onClose }: Student
               if (ctx && captureVideoRef.current) {
                 ctx.drawImage(captureVideoRef.current, 0, 0, 640, 480);
                 const dataUrl = canvas.toDataURL("image/jpeg");
-                setCapturedPhoto(dataUrl);
-                toast.success("AI Proctor: Face detected and aligned! Onboarding photo verified.");
+                
+                fetch("/api/proctoring/face-check", {
+                  method: "POST",
+                  headers: { 
+                    "Content-Type": "application/json",
+                    "x-user-id": user.id,
+                    "x-user-role": "user"
+                  },
+                  body: JSON.stringify({ selfie: dataUrl })
+                })
+                .then(res => res.json())
+                .then(resData => {
+                  if (resData.success && resData.data.faceDetected) {
+                    setCapturedPhoto(dataUrl);
+                    setFaceAligned(true);
+                    toast.success("AI Proctor: Face detected and aligned! Onboarding photo verified.");
+                  } else {
+                    setDetectionProgress(0);
+                    setFaceAligned(false);
+                    toast.error(resData.message || resData.data?.message || "AI Proctor: Face not detected. Retrying...");
+                  }
+                })
+                .catch(() => {
+                  setDetectionProgress(0);
+                  setFaceAligned(false);
+                  toast.error("AI Proctor: Connection error. Retrying...");
+                });
               }
             }
             return 100;
@@ -171,7 +195,7 @@ export default function StudentExamView({ assessmentId, user, onClose }: Student
     };
   }, [showPhotoCapture, capturedPhoto]);
 
-  const handleManualCapture = () => {
+  const handleManualCapture = async () => {
     if (!captureVideoRef.current) return;
     const canvas = document.createElement("canvas");
     canvas.width = 640;
@@ -180,10 +204,29 @@ export default function StudentExamView({ assessmentId, user, onClose }: Student
     if (ctx && captureVideoRef.current) {
       ctx.drawImage(captureVideoRef.current, 0, 0, 640, 480);
       const dataUrl = canvas.toDataURL("image/jpeg");
-      setCapturedPhoto(dataUrl);
-      setFaceAligned(true);
-      setDetectionProgress(100);
-      toast.success("Manual photo capture verified.");
+      
+      try {
+        const res = await fetch("/api/proctoring/face-check", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "x-user-id": user.id,
+            "x-user-role": "user"
+          },
+          body: JSON.stringify({ selfie: dataUrl })
+        });
+        const resData = await res.json();
+        if (res.ok && resData.success && resData.data.faceDetected) {
+          setCapturedPhoto(dataUrl);
+          setFaceAligned(true);
+          setDetectionProgress(100);
+          toast.success("Manual photo capture verified.");
+        } else {
+          toast.error(resData.message || resData.data?.message || "Manual photo capture verification failed: No face detected.");
+        }
+      } catch (err) {
+        toast.error("Error contacting face check service.");
+      }
     }
   };
 

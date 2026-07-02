@@ -35,6 +35,11 @@ import { TermsAndConditionsView } from "./pages/TermsAndConditionsView";
 import { PrivacyPolicyView } from "./pages/PrivacyPolicyView";
 import { LandingView } from "./pages/LandingView";
 
+// Notification and Profile Contexts
+import { NotificationProvider } from "./context/NotificationContext";
+import { ProfileProvider } from "./context/ProfileContext";
+import { ProfileCenter } from "./components/ProfileCenter";
+
 // Utility
 function parseUserAgent(ua?: string) {
   if (!ua) return "Detecting...";
@@ -55,6 +60,39 @@ function parseUserAgent(ua?: string) {
 
   return `${browser} on ${os}`;
 }
+
+interface AuthorizedPortalWrapperProps {
+  children: React.ReactNode;
+  user: any;
+  handleLogout: () => void;
+}
+
+const AuthorizedPortalWrapper: React.FC<AuthorizedPortalWrapperProps> = ({ children, user, handleLogout }) => {
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOpenProfile = () => {
+      setIsProfileOpen(true);
+    };
+    window.addEventListener("open-profile-drawer", handleOpenProfile);
+    return () => {
+      window.removeEventListener("open-profile-drawer", handleOpenProfile);
+    };
+  }, []);
+
+  return (
+    <NotificationProvider userId={user.id} userRole={user.role}>
+      <ProfileProvider userId={user.id} userRole={user.role}>
+        {children}
+        <ProfileCenter 
+          isOpen={isProfileOpen} 
+          onClose={() => setIsProfileOpen(false)} 
+          handleLogout={handleLogout} 
+        />
+      </ProfileProvider>
+    </NotificationProvider>
+  );
+};
 
 const ambientParticles = [
   { size: 6, top: "15%", left: "10%", delay: 0, duration: 22 },
@@ -964,33 +1002,39 @@ export default function App() {
 
     if (user.role === "faculty") {
       return (
-        <FacultyPortalView
-          user={user}
-          session={session}
-          handleLogout={handleLogout}
-        />
+        <AuthorizedPortalWrapper user={user} handleLogout={handleLogout}>
+          <FacultyPortalView
+            user={user}
+            session={session}
+            handleLogout={handleLogout}
+          />
+        </AuthorizedPortalWrapper>
       );
     }
 
     if (user.role === "support") {
       return (
-        <SupportDashboardView
-          user={user}
-          session={session}
-          handleLogout={handleLogout}
-        />
+        <AuthorizedPortalWrapper user={user} handleLogout={handleLogout}>
+          <SupportDashboardView
+            user={user}
+            session={session}
+            handleLogout={handleLogout}
+          />
+        </AuthorizedPortalWrapper>
       );
     }
 
     return (
-      <DashboardView
-        user={user}
-        session={session}
-        clientInfo={clientInfo}
-        handleLogout={handleLogout}
-        parseUserAgent={parseUserAgent}
-        onStartAssessment={setActiveAssessmentId}
-      />
+      <AuthorizedPortalWrapper user={user} handleLogout={handleLogout}>
+        <DashboardView
+          user={user}
+          session={session}
+          clientInfo={clientInfo}
+          handleLogout={handleLogout}
+          parseUserAgent={parseUserAgent}
+          onStartAssessment={setActiveAssessmentId}
+        />
+      </AuthorizedPortalWrapper>
     );
   }
 
@@ -1028,6 +1072,7 @@ export default function App() {
   if (view === "identity-verification") {
     return (
       <IdentityVerificationPage
+        user={user}
         onPrevious={() => setView("link-credentials")}
         onSkip={() => setView("security-setup")}
         onContinue={() => setView("security-setup")}
@@ -1120,9 +1165,13 @@ export default function App() {
           <AnimatePresence mode="wait">
             {user ? (
               isAdminPortal ? (
-                <AdminPanelView key="admin" user={user} handleBack={handleLogout} parseUserAgent={parseUserAgent} />
+                <AuthorizedPortalWrapper user={user} handleLogout={handleLogout}>
+                  <AdminPanelView key="admin" user={user} handleBack={handleLogout} parseUserAgent={parseUserAgent} />
+                </AuthorizedPortalWrapper>
               ) : (
-                <DashboardView key="dashboard" user={user} session={session} clientInfo={clientInfo} handleLogout={handleLogout} parseUserAgent={parseUserAgent} />
+                <AuthorizedPortalWrapper user={user} handleLogout={handleLogout}>
+                  <DashboardView key="dashboard" user={user} session={session} clientInfo={clientInfo} handleLogout={handleLogout} parseUserAgent={parseUserAgent} />
+                </AuthorizedPortalWrapper>
               )
             ) : (
               <>

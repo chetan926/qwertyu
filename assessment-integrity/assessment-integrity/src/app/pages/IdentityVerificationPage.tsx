@@ -10,12 +10,14 @@ import {
 } from '../components/identity-verification'
 
 interface IdentityVerificationPageProps {
+  user?: any
   onPrevious: () => void
   onSkip: () => void
   onContinue: () => void
 }
 
 export default function IdentityVerificationPage({ 
+  user,
   onPrevious, 
   onSkip, 
   onContinue 
@@ -41,7 +43,7 @@ export default function IdentityVerificationPage({
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <DocumentUpload />
-            <FaceVerification />
+            <FaceVerification user={user} />
           </div>
 
           <div className="mt-6">

@@ -18,6 +18,18 @@ model User {
   institutionName String?
   department      String?
   academicId      String?
+  phoneNumber     String?
+  designation     String?
+  bio             String?
+  joiningDate     DateTime? @default(now())
+  twoFactorEnabled Boolean   @default(false)
+  rollNumber      String?
+  semester        String?
+  branch          String?
+  section         String?
+  subjects        String?
+  accessLevel     String?
+  managedDepartments String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -239,6 +251,21 @@ model TicketMessage {
   createdAt      DateTime      @default(now())
 
   @@map("ticket_messages")
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String
+  type        String   // "announcement" | "assessment" | "report" | "system" | "message"
+  priority    String   @default("medium") // "low" | "medium" | "high"
+  read        Boolean  @default(false)
+  senderName  String?
+  senderRole  String?
+  createdAt   DateTime @default(now())
+
+  @@map("notifications")
 }
 
 

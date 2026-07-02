@@ -210,7 +210,7 @@ function Section({ number, title, children }: { number: string; title: string; c
     <div className="mb-10 sm:mb-14">
       <div className="flex items-baseline gap-4 mb-4 sm:mb-5">
         <span className="flex-shrink-0 text-[13px] font-bold tabular-nums text-[#b5ada4] w-7">{number}.</span>
-        <h2 className="text-[22px] sm:text-[26px] lg:text-[28px] font-bold tracking-[-0.8px] text-[#1a1917]">
+        <h2 className="text-[18px] sm:text-[20px] lg:text-[22px] font-bold tracking-[-0.8px] text-[#1a1917]">
           {title}
         </h2>
       </div>

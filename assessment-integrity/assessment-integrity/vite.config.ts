@@ -35,7 +35,7 @@ export default defineConfig({
     strictPort: false,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:3000',
+        target: 'http://127.0.0.1:5050',
         changeOrigin: true,
         secure: false,
         cookieDomainRewrite: 'localhost',

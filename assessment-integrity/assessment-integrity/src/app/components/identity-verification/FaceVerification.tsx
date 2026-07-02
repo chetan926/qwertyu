@@ -1,14 +1,130 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { ScanFace, CheckCircle2 } from 'lucide-react'
 import { Card, IconWrap, Badge } from '../ui/custom-verification'
 import type { ScanStatus } from '../../types/verification-types'
+import { toast } from 'sonner'
 
-export function FaceVerification() {
+interface FaceVerificationProps {
+  user?: any
+}
+
+export function FaceVerification({ user }: FaceVerificationProps) {
   const [status, setStatus] = useState<ScanStatus>('idle')
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const [stream, setStream] = useState<MediaStream | null>(null)
 
-  function handleBegin() {
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop())
+      }
+    }
+  }, [stream])
+
+  async function handleBegin() {
     setStatus('scanning')
-    setTimeout(() => setStatus('verified'), 2800)
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 640, height: 480, facingMode: 'user' }
+      })
+      setStream(mediaStream)
+      
+      // Allow DOM to render video element before setting srcObject
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream
+        }
+      }, 50)
+
+      setTimeout(async () => {
+        if (!videoRef.current) {
+          mediaStream.getTracks().forEach(track => track.stop())
+          setStream(null)
+          setStatus('idle')
+          return
+        }
+
+        const canvas = document.createElement('canvas')
+        canvas.width = 640;
+        canvas.height = 480;
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          mediaStream.getTracks().forEach(track => track.stop())
+          setStream(null)
+          setStatus('idle')
+          return
+        }
+
+        ctx.drawImage(videoRef.current, 0, 0, 640, 480)
+        const selfieBase64 = canvas.toDataURL('image/jpeg')
+        const idPhotoBase64 = localStorage.getItem('uploaded_id_card') || undefined
+
+        try {
+          const res = await fetch('/api/proctoring/face-check', {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              ...(user ? { 'x-user-id': user.id, 'x-user-role': user.role } : {})
+            },
+            body: JSON.stringify({ selfie: selfieBase64, idPhoto: idPhotoBase64 })
+          })
+          const data = await res.json()
+          
+          if (res.ok && data.success && data.data.faceDetected) {
+            let isVerified = false
+            if (idPhotoBase64) {
+              if (data.data.match) {
+                isVerified = true
+                setStatus('verified')
+                toast.success('Face matched to ID successfully!')
+              } else {
+                setStatus('idle')
+                toast.error(data.data.message || 'Face verification failed: Face does not match the uploaded ID.')
+              }
+            } else {
+              isVerified = true
+              setStatus('verified')
+              toast.success('Face detected and verified!')
+            }
+
+            if (isVerified && user) {
+              try {
+                const profileRes = await fetch('/api/profile', {
+                  method: 'PUT',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-id': user.id,
+                    'x-user-role': user.role
+                  },
+                  body: JSON.stringify({ image: selfieBase64 })
+                })
+                const profileData = await profileRes.json()
+                if (profileRes.ok && profileData.success) {
+                  toast.success('Identity photo registered permanently!')
+                } else {
+                  console.error('Failed to store profile image:', profileData.message)
+                }
+              } catch (profileErr) {
+                console.error('Network error storing profile image:', profileErr)
+              }
+            }
+          } else {
+            setStatus('idle')
+            toast.error(data.message || 'Face detection failed. Position your face in front of the camera.')
+          }
+        } catch (err) {
+          setStatus('idle')
+          toast.error('Error contacting face check service.')
+        } finally {
+          mediaStream.getTracks().forEach(track => track.stop())
+          setStream(null)
+        }
+      }, 2500)
+
+    } catch (err) {
+      setStatus('idle')
+      toast.error('Could not access webcam. Please verify permissions.')
+    }
   }
 
   return (
@@ -28,6 +144,15 @@ export function FaceVerification() {
       </div>
 
       <div className="relative rounded-2xl bg-ink-900 overflow-hidden h-64 flex items-center justify-center">
+        {status === 'scanning' && stream && (
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className="absolute inset-0 w-full h-full object-cover scale-x-[-1]"
+          />
+        )}
         {status === 'scanning' && (
           <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-tan-400/40 via-tan-400/10 to-transparent animate-scan-sweep pointer-events-none" />
         )}

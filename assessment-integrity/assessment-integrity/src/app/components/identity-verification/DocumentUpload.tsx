@@ -17,6 +17,25 @@ export function DocumentUpload() {
   function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return
     const file = files[0]
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth || img.width;
+        canvas.height = img.naturalHeight || img.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          const jpegBase64 = canvas.toDataURL('image/jpeg');
+          localStorage.setItem('uploaded_id_card', jpegBase64);
+        }
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+
     setDocument({
       name: file.name,
       sizeLabel: formatSize(file.size),
@@ -82,6 +101,7 @@ export function DocumentUpload() {
               onClick={(e) => {
                 e.stopPropagation()
                 setDocument(null)
+                localStorage.removeItem('uploaded_id_card')
               }}
               className="shrink-0 text-ink-400 hover:text-ink-700 transition-premium"
               aria-label="Remove file"

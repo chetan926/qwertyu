@@ -21,6 +21,16 @@ const envSchema = z.object({
 	SMTP_USER: z.string().email(),
 
 	SMTP_PASS: z.string().min(1),
+
+	FACE_API_MODELS_PATH: z.string().min(1),
+
+	FACE_MATCH_THRESHOLD: z.coerce.number().default(0.55),
+
+	OLLAMA_BASE_URL: z.string().url().default("http://127.0.0.1:11434"),
+
+	OLLAMA_EMBEDDING_MODEL: z.string().min(1).default("nomic-embed-text"),
+
+	OLLAMA_CHAT_MODEL: z.string().min(1).default("llama3.2:3b"),
 });
 
 const parsed = envSchema.safeParse(process.env);

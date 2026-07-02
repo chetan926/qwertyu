@@ -10,6 +10,12 @@ import { authenticationRouter } from "./features/authentication/routes/authentic
 import { assessmentRouter } from "./features/assessments/routes/assessment-routes";
 import { supportRouter } from "./features/support/routes/support-routes";
 import { healthRouter } from "./features/health/routes/health-routes";
+import { notificationRouter } from "./features/notifications/routes/notification-routes";
+import { profileRouter } from "./features/profile/routes/profile-routes";
+import { proctoringRouter } from "./features/proctoring/routes/proctoring-routes";
+import { textExtractionRouter } from "./features/text-extraction/routes/text-extraction-routes";
+import { answerSimilarityRouter } from "./features/answer-similarity/routes/answer-similarity-routes";
+import { plagiarismRouter } from "./features/plagiarism/routes/plagiarism-routes";
 import { errorHandler } from "./middleware/error-handler";
 import { notFound } from "./middleware/not-found";
 import { auth } from "./providers/auth";
@@ -100,6 +106,12 @@ app.use("/api/authentication", authenticationRouter);
 app.use("/api/assessments", assessmentRouter);
 app.use("/api/support", supportRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/notifications", notificationRouter);
+app.use("/api/profile", profileRouter);
+app.use("/api/proctoring", proctoringRouter);
+app.use("/api/text-extraction", textExtractionRouter);
+app.use("/api/answer-similarity", answerSimilarityRouter);
+app.use("/api/plagiarism", plagiarismRouter);
 
 app.use(notFound);
 app.use(errorHandler);
